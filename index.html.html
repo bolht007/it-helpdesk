@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Help Desk — Bangkok Steel</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --steel: #1a2332;
+    --steel-mid: #243447;
+    --steel-light: #2e4060;
+    --accent: #2563eb;
+    --accent-dim: #1d4ed8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --border: rgba(255,255,255,0.08);
+    --card: rgba(255,255,255,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    background: var(--steel);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: var(--steel-mid);
+    border-bottom: 2px solid var(--accent);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.1em;
+  }
+
+  .header-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* Layout */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* Stats Row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .stat-card.open::before { background: var(--yellow); }
+  .stat-card.inprogress::before { background: #3b82f6; }
+  .stat-card.done::before { background: var(--green); }
+  .stat-card.total::before { background: var(--accent); }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .stat-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .stat-card.open .stat-num { color: var(--yellow); }
+  .stat-card.inprogress .stat-num { color: #3b82f6; }
+  .stat-card.done .stat-num { color: var(--green); }
+  .stat-card.total .stat-num { color: var(--accent); }
+
+  /* Main Grid */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+  }
+
+  /* Form */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .badge {
+    background: var(--accent);
+    color: var(--steel);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .panel-body { padding: 24px; }
+
+  .form-group { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: var(--steel-mid);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  select option { background: var(--steel-mid); }
+  textarea { resize: vertical; min-height: 100px; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .priority-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .priority-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .priority-btn:hover { border-color: currentColor; }
+  .priority-btn.low { --c: var(--green); }
+  .priority-btn.medium { --c: var(--yellow); }
+  .priority-btn.high { --c: var(--red); }
+  .priority-btn.active { background: var(--c); color: white; border-color: var(--c); }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: var(--steel);
+    border: none;
+    border-radius: 10px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .submit-btn:hover {
+    background: var(--accent-dim);
+    transform: translateY(-1px);
+  }
+
+  .submit-btn:active { transform: translateY(0); }
+
+  /* Ticket List */
+  .ticket-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .ticket {
+    background: var(--steel-mid);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    animation: slideIn 0.3s ease forwards;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ticket::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .ticket.low::before { background: var(--green); }
+  .ticket.medium::before { background: var(--yellow); }
+  .ticket.high::before { background: var(--red); }
+
+  .ticket:hover {
+    border-color: rgba(255,255,255,0.15);
+    transform: translateX(2px);
+  }
+
+  .ticket-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .ticket-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  .ticket-status {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .status-open { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .status-inprogress { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .status-done { background: rgba(34,197,94,0.15); color: var(--green); }
+
+  .ticket-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .ticket-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .ticket-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .action-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+  }
+
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .action-btn.done-btn:hover { border-color: var(--green); color: var(--green); }
+
+  .empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-dim);
+  }
+
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--green);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .main-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">IT</div>
+    <div>
+      <div class="logo-text">IT SERVICE DESK</div>
+      <div class="logo-sub">BANGKOK STEEL INDUSTRY CO., LTD.</div>
+    </div>
+  </div>
+  <div class="header-time" id="clock"></div>
+</header>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat-card open">
+      <div class="stat-label">รอดำเนินการ</div>
+      <div class="stat-num" id="count-open">0</div>
+    </div>
+    <div class="stat-card inprogress">
+      <div class="stat-label">กำลังดำเนินการ</div>
+      <div class="stat-num" id="count-inprogress">0</div>
+    </div>
+    <div class="stat-card done">
+      <div class="stat-label">เสร็จแล้ว</div>
+      <div class="stat-num" id="count-done">0</div>
+    </div>
+    <div class="stat-card total">
+      <div class="stat-label">ทั้งหมด</div>
+      <div class="stat-num" id="count-total">0</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Form -->
+    <div class="panel">
+      <div class="panel-header">
+        
+        <span class="panel-title">IT Incident Report</span>
+        <span class="badge">NEW TICKET</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>ชื่อผู้แจ้ง</label>
+            <input type="text" id="reporter" placeholder="ชื่อ-นามสกุล">
+          </div>
+          <div class="form-group">
+            <label>แผนก</label>
+            <select id="department">
+              <option value="">— เลือกแผนก —</option>
+              <option>แผนกคอมพิวเตอร์</option>
+              <option>ฝ่ายขาย</option>
+              <option>ฝ่ายบัญชี</option>
+              <option>ฝ่ายผลิต</option>
+              <option>ฝ่าย HR</option>
+              <option>ฝ่ายจัดซื้อ</option>
+              <option>อื่นๆ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ประเภทปัญหา</label>
+          <select id="category">
+            <option value="">— เลือกประเภท —</option>
+            <option>คอมพิวเตอร์/Hardware</option>
+            <option>ซอฟต์แวร์/Software</option>
+            <option>อินเทอร์เน็ต/เครือข่าย</option>
+            <option>อีเมล</option>
+            <option>เครื่องพิมพ์</option>
+            <option>ระบบ 3CX โทรศัพท์</option>
+            <option>อื่นๆ</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>รายละเอียดปัญหา</label>
+          <textarea id="detail" placeholder="อธิบายปัญหาที่พบ..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ระดับความเร่งด่วน</label>
+          <div class="priority-group">
+            <button class="priority-btn low active" onclick="setPriority('low', this)">Normal</button>
+            <button class="priority-btn medium" onclick="setPriority('medium', this)">Urgent</button>
+            <button class="priority-btn high" onclick="setPriority('high', this)">Critical</button>
+          </div>
+        </div>
+
+        <button class="submit-btn" onclick="submitTicket()">Submit Ticket</button>
+      </div>
+    </div>
+
+    <!-- Ticket List -->
+    <div class="panel">
+      <div class="panel-header">
+        
+        <span class="panel-title">Ticket Queue</span>
+      </div>
+      <div class="panel-body" style="padding:16px">
+        <div class="ticket-list" id="ticketList">
+          <div class="empty">
+            <div class="empty-icon"></div>
+            <div class="empty-text">No Tickets Available</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let tickets = [];
+  let ticketCounter = 1;
+  let selectedPriority = 'low';
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleDateString('th-TH', { day:'2-digit', month:'short', year:'numeric' }) + ' ' +
+      now.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  function setPriority(p, btn) {
+    selectedPriority = p;
+    document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function submitTicket() {
+    const reporter = document.getElementById('reporter').value.trim();
+    const department = document.getElementById('department').value;
+    const category = document.getElementById('category').value;
+    const detail = document.getElementById('detail').value.trim();
+
+    if (!reporter || !department || !category || !detail) {
+      showToast('⚠️ กรุณากรอกข้อมูลให้ครบครับ');
+      return;
+    }
+
+    const ticket = {
+      id: 'IT-' + String(ticketCounter++).padStart(4, '0'),
+      reporter, department, category, detail,
+      priority: selectedPriority,
+      status: 'open',
+      time: new Date().toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' })
+    };
+
+    tickets.unshift(ticket);
+    renderTickets();
+    updateStats();
+
+    // Reset form
+    document.getElementById('reporter').value = '';
+    document.getElementById('department').value = '';
+    document.getElementById('category').value = '';
+    document.getElementById('detail').value = '';
+    setPriority('low', document.querySelector('.priority-btn.low'));
+
+    showToast('✅ ส่ง Ticket ' + ticket.id + ' สำเร็จครับ');
+  }
+
+  function updateStatus(id, status) {
+    const t = tickets.find(t => t.id === id);
+    if (t) { t.status = status; renderTickets(); updateStats(); }
+  }
+
+  function deleteTicket(id) {
+    tickets = tickets.filter(t => t.id !== id);
+    renderTickets();
+    updateStats();
+  }
+
+  function updateStats() {
+    document.getElementById('count-open').textContent = tickets.filter(t => t.status === 'open').length;
+    document.getElementById('count-inprogress').textContent = tickets.filter(t => t.status === 'inprogress').length;
+    document.getElementById('count-done').textContent = tickets.filter(t => t.status === 'done').length;
+    document.getElementById('count-total').textContent = tickets.length;
+  }
+
+  function renderTickets() {
+    const list = document.getElementById('ticketList');
+    if (tickets.length === 0) {
+      list.innerHTML = '<div class="empty"><div class="empty-icon"></div><div class="empty-text">No Tickets Available</div></div>';
+      return;
+    }
+
+    const statusLabel = { open: 'รอดำเนินการ', inprogress: 'กำลังดำเนินการ', done: 'เสร็จแล้ว' };
+    const statusClass = { open: 'status-open', inprogress: 'status-inprogress', done: 'status-done' };
+    const priorityLabel = { low: 'Normal', medium: 'Urgent', high: 'Critical' };
+
+    list.innerHTML = tickets.map(t => `
+      <div class="ticket ${t.priority}">
+        <div class="ticket-top">
+          <span class="ticket-id">${t.id} · ${t.time}</span>
+          <span class="ticket-status ${statusClass[t.status]}">${statusLabel[t.status]}</span>
+        </div>
+        <div class="ticket-title">${t.category}</div>
+        <div class="ticket-meta">
+          <span>Reporter: ${t.reporter}</span>
+          <span>Department: ${t.department}</span>
+          <span>${priorityLabel[t.priority]}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:6px">${t.detail.substring(0,60)}${t.detail.length > 60 ? '...' : ''}</div>
+        <div class="ticket-actions">
+          ${t.status === 'open' ? `<button class="action-btn" onclick="updateStatus('${t.id}','inprogress')">Assign</button>` : ''}
+          ${t.status === 'inprogress' ? `<button class="action-btn done-btn" onclick="updateStatus('${t.id}','done')">Close</button>` : ''}
+          <button class="action-btn" onclick="deleteTicket('${t.id}')">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  updateStats();
+</script>
+</body>
+</html>
